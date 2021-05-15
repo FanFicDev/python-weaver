@@ -1,0 +1,5 @@
+python-weaver is a small utility for web crawling in python.
+
+This includes a python library called weaver (found in src/) along with a
+number of utility scripts written against it (top level *.py files).
+
