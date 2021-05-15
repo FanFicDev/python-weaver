@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Optional, Any, Iterator, List, Set, Iterable
 if TYPE_CHECKING:
 	import psycopg2
-from oil.util import compress, uncompress
+from oil.util import compress, uncompress, getUniqueJobName
 
 class Web:
 	def __init__(self, id_: int = None, created_: int = None, url_: str = None,
@@ -48,7 +48,7 @@ class Web:
 	@staticmethod
 	def fetchIdRange_g(db: 'psycopg2.connection', start: int, end: int,
 			ulike: str = None, status: int = 200) -> Iterator['Web']:
-		with db, db.cursor() as curs:
+		with db, db.cursor(getUniqueJobName('Web.fetchIdRange_g')) as curs:
 			curs.execute('''
 				select * from web w
 				where (%s is null or w.url like %s)
