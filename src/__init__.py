@@ -6,3 +6,4 @@ from weaver.db import (
 	WebQueue,
 )
 from weaver.web_scraper import WebScraper
+from weaver.remote_web_scraper import RemoteWebScraper
