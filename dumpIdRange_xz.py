@@ -81,6 +81,7 @@ def main(db: 'psycopg2.connection') -> int:
 
 			s = io.BytesIO(html.encode('utf-8'))
 			ti = tarfile.TarInfo(name=f"./{w.id}.html")
+			ti.mtime = int(w.created//1000)
 			ti.size = len(html.encode('utf-8'))
 			xzf.addfile(tarinfo=ti, fileobj=s)
 
