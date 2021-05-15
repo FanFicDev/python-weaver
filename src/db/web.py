@@ -65,15 +65,18 @@ class Web:
 		return [w for w in Web.fetchIdRange_g(db, start, end, ulike, status)]
 
 	@staticmethod
-	def latest(db: 'psycopg2.connection', url: Optional[str],
-			ulike: Optional[str] = None) -> Optional['Web']:
+	def latest(db: 'psycopg2.connection', url: Optional[str] = None,
+			ulike: Optional[str] = None, status: Optional[int] = None
+			) -> Optional['Web']:
 		with db, db.cursor() as curs:
 			curs.execute('''
 				select * from web w
 				where (%s is null or w.url = %s)
 					and (%s is null or w.url like %s)
+					and (%s is null or w.status = %s)
+					and (%s is not null or w.status != 429)
 				order by created desc nulls last
-			''', (url, url, ulike, ulike))
+			''', (url, url, ulike, ulike, status, status, status))
 			r = curs.fetchone()
 			if r is None:
 				return None
