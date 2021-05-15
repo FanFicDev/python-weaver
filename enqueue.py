@@ -8,5 +8,5 @@ with oil.open() as db:
 		url = line.strip()
 		if not url.startswith('http'):
 			raise Exception(f"what: {url}")
-		WebQueue.enqueue(db, url)
+		WebQueue.enqueue(db, url, stale=0, musty=0, status=None)
 
