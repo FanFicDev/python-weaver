@@ -83,6 +83,23 @@ class Web:
 			return Web.fromRow(r)
 
 	@staticmethod
+	def oldest(db: 'psycopg2.connection', url: Optional[str] = None,
+			ulike: Optional[str] = None, status: Optional[int] = None
+			) -> Optional['Web']:
+		with db, db.cursor() as curs:
+			curs.execute('''
+				select * from web w
+				where (%s is null or w.url = %s)
+					and (%s is null or w.url like %s)
+					and (%s is null or w.status = %s)
+				order by created asc nulls last
+			''', (url, url, ulike, ulike, status, status))
+			r = curs.fetchone()
+			if r is None:
+				return None
+			return Web.fromRow(r)
+
+	@staticmethod
 	def latestMany(db: 'psycopg2.connection', urls_: List[str]) -> List['Web']:
 		urls = tuple(urls_)
 		with db, db.cursor() as curs:
