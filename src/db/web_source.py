@@ -47,7 +47,8 @@ class WebSource:
 		return WebSource.create(db, name, source)
 
 	@staticmethod
-	def fromEnvironment(db: 'psycopg2.connection') -> 'WebSource':
+	def fromEnvironment(db: 'psycopg2.connection', name: str = 'minerva'
+			) -> 'WebSource':
 		import os
 		src = None
 		if 'OIL_SCRAPE_SOURCE' in os.environ:
@@ -56,6 +57,6 @@ class WebSource:
 			from oil.util import lookupRemoteIP
 			src = lookupRemoteIP()
 
-		name = 'minerva' # TODO: from env?
+		# TODO: name from env?
 		return WebSource.lookup(db, name, src)
 
