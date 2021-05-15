@@ -13,7 +13,9 @@ class WebSource:
 		self.description = description_
 
 	def isLocal(self) -> bool:
-		return self.source is None or self.source.startswith(_localPrefix)
+		return self.source is None \
+				or self.source.startswith(_localPrefix) \
+				or self.source.startswith('127.')
 
 	@staticmethod
 	def create(db: 'psycopg2.connection', name: str, source: str) -> 'WebSource':
