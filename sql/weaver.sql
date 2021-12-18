@@ -75,7 +75,8 @@ create table if not exists web_queue (
 	touched oil_timestamp,
 	stale oil_timestamp not null,
 	musty oil_timestamp not null,
-	priority int4
+	priority int4,
+	kind int4
 );
 
 create index if not exists web_queue_idx on web_queue (url, status);
