@@ -45,7 +45,8 @@ create table if not exists web (
 	-- probably null
 	requestHeaders bytea,
 	responseHeaders bytea,
-	wbaseId smallint references web_base(id)
+	wbaseId smallint references web_base(id),
+	finalUrl url
 );
 
 create index if not exists web_idx on web (url, status, created);

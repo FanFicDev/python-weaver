@@ -7,7 +7,8 @@ class Web:
 	def __init__(self, id_: int = None, created_: int = None, url_: str = None,
 			status_: int = None, sourceId_: int = None, encoding_: int = None,
 			response_: bytes = None, requestHeaders_: Optional[bytes] = None,
-			responseHeaders_: Optional[bytes] = None, wbaseId_: Optional[int] = None):
+			responseHeaders_: Optional[bytes] = None, wbaseId_: Optional[int] = None,
+			finalUrl_: str = None):
 		self.id = id_
 		self.created = created_
 		self.url = url_
@@ -18,6 +19,9 @@ class Web:
 		self.requestHeaders = requestHeaders_
 		self.responseHeaders = responseHeaders_
 		self.wbaseId = wbaseId_
+		self.finalUrl = finalUrl_
+		if self.finalUrl is None:
+			self.finalUrl = self.url
 
 	@staticmethod
 	def maxId(db: 'psycopg2.connection') -> int:
@@ -43,6 +47,7 @@ class Web:
 				responseHeaders_ = None if row[8] is None \
 						else uncompress(row[8].tobytes()),
 				wbaseId_ = row[9],
+				finalUrl_ = row[10],
 			)
 
 	@staticmethod
@@ -76,6 +81,7 @@ class Web:
 					and (%s is null or w.status = %s)
 					and (%s is not null or w.status != 429)
 				order by created desc nulls last
+				limit 1
 			''', (url, url, ulike, ulike, status, status, status))
 			r = curs.fetchone()
 			if r is None:
@@ -93,6 +99,7 @@ class Web:
 					and (%s is null or w.url like %s)
 					and (%s is null or w.status = %s)
 				order by created asc nulls last
+				limit 1
 			''', (url, url, ulike, ulike, status, status))
 			r = curs.fetchone()
 			if r is None:
@@ -151,13 +158,14 @@ class Web:
 		with db.cursor() as curs:
 			curs.execute('''
 				insert into web(created, url, status, sourceId, encoding, response,
-					requestHeaders, responseHeaders)
-				values(%s, %s, %s, %s, %s, %s, %s, %s)
+					requestHeaders, responseHeaders, finalUrl)
+				values(%s, %s, %s, %s, %s, %s, %s, %s, %s)
 				returning id
 			''', (self.created, self.url, self.status, self.sourceId, self.encoding,
 				None if self.response is None else compress(self.response),
 				None if self.requestHeaders is None else compress(self.requestHeaders),
-				None if self.responseHeaders is None else compress(self.responseHeaders)))
+				None if self.responseHeaders is None else compress(self.responseHeaders),
+				None if self.finalUrl == self.url else self.finalUrl))
 			r = curs.fetchone()
 			if r is None:
 				raise Exception(f"failed to insert?")

@@ -101,6 +101,7 @@ class WebScraper:
 			w.response = (r.content)
 			w.requestHeaders = str(r.request.headers).encode('utf-8')
 			w.responseHeaders = str(r.headers).encode('utf-8')
+			w.finalUrl = r.url
 		except:
 			logMessage(f'scrape|exception|{url}', 'scrape.log')
 			raise
