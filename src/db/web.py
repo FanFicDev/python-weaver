@@ -25,7 +25,7 @@ class Web:
 
 	@staticmethod
 	def maxId(db: 'psycopg2.connection') -> int:
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('''
 				select max(w.id) from web w
 			''')
@@ -53,7 +53,7 @@ class Web:
 	@staticmethod
 	def fetchIdRange_g(db: 'psycopg2.connection', start: int, end: int,
 			ulike: str = None, status: int = 200) -> Iterator['Web']:
-		with db, db.cursor(getUniqueJobName('Web.fetchIdRange_g')) as curs:
+		with db.cursor(getUniqueJobName('Web.fetchIdRange_g')) as curs:
 			curs.execute('''
 				select * from web w
 				where (%s is null or w.url like %s)
@@ -73,7 +73,7 @@ class Web:
 	def latest(db: 'psycopg2.connection', url: Optional[str] = None,
 			ulike: Optional[str] = None, status: Optional[int] = None
 			) -> Optional['Web']:
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('''
 				select * from web w
 				where (%s is null or w.url = %s)
@@ -92,7 +92,7 @@ class Web:
 	def oldest(db: 'psycopg2.connection', url: Optional[str] = None,
 			ulike: Optional[str] = None, status: Optional[int] = None
 			) -> Optional['Web']:
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('''
 				select * from web w
 				where (%s is null or w.url = %s)
@@ -109,7 +109,7 @@ class Web:
 	@staticmethod
 	def latestMany(db: 'psycopg2.connection', urls_: List[str]) -> List['Web']:
 		urls = tuple(urls_)
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('''
 				select w.*
 				from web w
@@ -126,7 +126,7 @@ class Web:
 	def wcache(db: 'psycopg2.connection', urls_: Iterable[str],
 			status: int = 200) -> Set[str]:
 		urls = tuple(urls_)
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('''
 				select w.url
 				from web w
@@ -138,7 +138,7 @@ class Web:
 	@staticmethod
 	def countFFNNeedsCached(db: 'psycopg2.connection', start: int, end: int,
 			cid: int, stripeCount: int, stripe: int, status: int = 200) -> int:
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('''
 				select count(1)
 				from generate_series(%s, %s) n
@@ -172,11 +172,8 @@ class Web:
 			self.id = int(r[0])
 			return self.id
 
-	def save(self, db: 'psycopg2.connection', trans: bool = True) -> int:
+	def save(self, db: 'psycopg2.connection') -> int:
 		if self.id is not None:
 			raise Exception('Web only supports insert')
-		if trans:
-			with db:
-				return self._save(db)
 		return self._save(db)
 

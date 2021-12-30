@@ -20,7 +20,7 @@ class WebSource:
 	@staticmethod
 	def create(db: 'psycopg2.connection', name: str, source: str) -> 'WebSource':
 		created = False
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('''
 				insert into web_source(name, source) values(%s, %s) returning id
 			''', (name, source))
@@ -32,7 +32,7 @@ class WebSource:
 
 	@staticmethod
 	def lookup(db: 'psycopg2.connection', name: str, source: str) -> 'WebSource':
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('''
 				select * from web_source ws where ws.name = %s and ws.source = %s
 			''', (name, source))

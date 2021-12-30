@@ -22,7 +22,7 @@ class WebBase:
 
 	@staticmethod
 	def lookup(db: 'psycopg2.connection', wbaseId: int) -> Optional['WebBase']:
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('''
 				select * from web_base wb
 				where wb.id = %s

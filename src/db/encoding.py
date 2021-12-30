@@ -9,7 +9,7 @@ class Encoding:
 
 	@staticmethod
 	def create(db: 'psycopg2.connection', name: str) -> 'Encoding':
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('insert into encoding(name) values(%s) returning id', (name,))
 			row = curs.fetchone()
 			if row is not None:
@@ -18,7 +18,7 @@ class Encoding:
 
 	@staticmethod
 	def lookup(db: 'psycopg2.connection', name: str) -> 'Encoding':
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('select * from encoding e where e.name = %s', (name,))
 			row = curs.fetchone()
 			if row is None:

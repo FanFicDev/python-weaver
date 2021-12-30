@@ -38,7 +38,7 @@ class WebQueue:
 
 	@staticmethod
 	def resetWorker(db: 'psycopg2.connection', workerId: int) -> None:
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('''
 				update web_queue
 				set workerId = null, touched = oil_timestamp()
@@ -49,7 +49,7 @@ class WebQueue:
 	def next(db: 'psycopg2.connection', workerId: int, kind: int,
 			ulike: str = '%', stale: int = (45 * 1000),
 			stripeCount: int = 1, stripe: int = 0) -> Optional['WebQueue']:
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('''
 				update web_queue wq
 				set workerId = %s, touched = oil_timestamp()
@@ -74,7 +74,7 @@ class WebQueue:
 
 	@staticmethod
 	def queued(db: 'psycopg2.connection', url: str) -> Optional['WebQueue']:
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('''
 				select * from web_queue
 				where url = %s
@@ -96,7 +96,7 @@ class WebQueue:
 		# TODO trying to skip requeue is complicated...
 		kind = WebQueue.get_kind(url)
 
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			import time
 			curs.execute('''
 				insert into web_queue(
@@ -112,11 +112,11 @@ class WebQueue:
 	def dequeue(self, db: 'psycopg2.connection') -> None:
 		if self.id is None or int(self.id) < 1:
 			return
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('delete from web_queue where id = %s', (self.id,))
 
 	def exists(self, db: 'psycopg2.connection') -> bool:
-		with db, db.cursor() as curs:
+		with db.cursor() as curs:
 			curs.execute('''
 				select * from web_queue
 				where id = %s
